@@ -1,0 +1,64 @@
+# Composeファイルバージョン
+version: '3.8'
+
+# 各コンテナの設定
+services:
+  
+  # DBコンテナ設定
+  db:
+    # ベースイメージの設定
+    image: postgres:12.3-alpine
+    # 環境変数の設定
+    environment:
+      # タイムゾーンの設定
+      TZ: UTC
+      # タイムゾーンの設定補助
+      PGTZ: UTC
+      # 変数パスワード
+      POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+    # データベースの永続化(ボリュームの設定)
+    volumes:
+      - ./api/tmp/db:/var/lib/postgresql/data
+  # apiコンテナの設定
+  api:
+    # ベースイメージの指定(Dockerfile)
+    build:
+      context: ./api
+      # Dockerfileへ値を渡す
+      args:
+        WORKDIR: $WORKDIR
+    # 環境変数の設定
+    environment:
+      # 変数パスワード
+      POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+    # ボリュームの設定
+    volumes:
+      - ./api:/$WORKDIR
+    # 依存先のサービスを設定
+    depends_on:
+      - db
+    # ポート番号の設定
+    ports:
+      - "$API_PORT:$CONTAINER_PORT"
+
+  # フロントコンテナの指定
+  front:
+
+    # ベースイメージの指定(Dockerfile)
+    build:
+      context: ./front
+      # Dockerfileへ値を渡す
+      args:
+        WORKDIR: $WORKDIR
+        CONTAINER_PORT: $CONTAINER_PORT
+    # コンテナでコマンドを実行
+    command: yarn run dev
+    # ボリュームの設定
+    volumes:
+      - ./front:/$WORKDIR
+    # ポート番号の設定
+    ports:
+      - "$FRONT_PORT:$CONTAINER_PORT"
+    # 依存先のサービスを設定
+    depends_on:
+      - api
