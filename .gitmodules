@@ -1,0 +1,6 @@
+[submodule "api"]
+  path = api
+  url = https://github.com/tt2tt/myapp-api
+[submodule "front"]
+  path = front
+  url = https://github.com/tt2tt/myapp-front
