@@ -3,7 +3,7 @@ version: '3.8'
 
 # 各コンテナの設定
 services:
-  
+
   # DBコンテナ設定
   db:
     # ベースイメージの設定
@@ -31,6 +31,8 @@ services:
     environment:
       # 変数パスワード
       POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+      # APIドメイン
+      API_DOMAIN: "localhost:$FRONT_PORT"
     # ボリュームの設定
     volumes:
       - ./api:/$WORKDIR
@@ -51,6 +53,8 @@ services:
       args:
         WORKDIR: $WORKDIR
         CONTAINER_PORT: $CONTAINER_PORT
+        # APIURL
+        API_URL: "http://localhost:$API_PORT"
     # コンテナでコマンドを実行
     command: yarn run dev
     # ボリュームの設定
